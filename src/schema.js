@@ -4,12 +4,113 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLInt,
+  GraphQLFloat,
 } from 'graphql/type';
 import lowdb from 'lowdb';
 import FileSync from 'lowdb/adapters/FileSync';
 import path from 'path';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, './data.json')));
+
+const CoordinateType = new GraphQLObjectType({
+  name: 'Coordinate',
+  description: 'Geographical Coordinate',
+  fields: () => ({
+    latitude: {
+      type: (GraphQLFloat),
+      description: 'latitude',
+    },
+    longitude: {
+      type: (GraphQLFloat),
+      description: 'longitude',
+    },
+  }),
+});
+
+const CompanyType = new GraphQLObjectType({
+  name: 'Company',
+  description: 'Company',
+  fields: () => ({
+    name: {
+      type: (GraphQLString),
+      description: 'name',
+    },
+    catchPhrase: {
+      type: (GraphQLString),
+      description: 'catch phrase',
+    },
+    bullshit: {
+      type: (GraphQLString),
+      description: 'bull shiiiiet',
+    },
+  }),
+});
+
+const AddressType = new GraphQLObjectType({
+  name: 'Address',
+  description: 'Address Item',
+  fields: () => ({
+    street: {
+      type: (GraphQLString),
+      description: 'street name',
+    },
+    suite: {
+      type: (GraphQLString),
+      description: 'additional street address classification',
+    },
+    city: {
+      type: (GraphQLString),
+      description: 'city name',
+    },
+    zipcode: {
+      type: (GraphQLString),
+      description: 'zip code value',
+    },
+    coordinate: {
+      type: (CoordinateType),
+      description: 'coordinate',
+    },
+  }),
+});
+
+const UserType = new GraphQLObjectType({
+  name: 'User',
+  description: 'User Item',
+  fields: () => ({
+    id: {
+      type: (GraphQLInt),
+      description: 'id of user',
+    },
+    name: {
+      type: (GraphQLString),
+      description: 'name of user',
+    },
+    username: {
+      type: (GraphQLString),
+      description: 'username of user',
+    },
+    email: {
+      type: (GraphQLString),
+      description: 'email of user',
+    },
+    address: {
+      type: (AddressType),
+      description: 'address of user',
+    },
+    phone: {
+      type: (GraphQLString),
+      description: 'phone number of user',
+    },
+    website: {
+      type: (GraphQLString),
+      description: 'web site of user',
+    },
+    company: {
+      type: (CompanyType),
+      description: 'company',
+    },
+  }),
+});
 
 const PostType = new GraphQLObjectType({
   name: 'post',
@@ -19,9 +120,9 @@ const PostType = new GraphQLObjectType({
       type: (GraphQLInt),
       description: 'id of the post',
     },
-    userId: {
-      type: (GraphQLInt),
-      description: 'id of user that created the post',
+    user: {
+      type: (UserType),
+      description: 'user that created the post',
     },
     title: {
       type: (GraphQLString),
@@ -61,8 +162,29 @@ const schema = new GraphQLSchema({
             filters.userId = userId;
           }
 
-          return db.get('posts').filter(filters).value();
+          const user = db.get('users').find({ id: userId }).value();
+
+          if (!user) {
+            throw new Error(`Unable to identify user with id: ${userId}`);
+          }
+
+          return db.get('posts').filter(filters).value().map(post => ({
+            id: post.id,
+            user,
+            title: post.title,
+            body: post.body,
+          }));
         },
+      },
+      user: {
+        type: UserType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLInt,
+          },
+        },
+        resolve: (root, { id }) => db.get('users').find({ id }).value(),
       },
     },
   }),
