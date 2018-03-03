@@ -11,6 +11,8 @@ import path from 'path';
 
 import PostType from './types/Post';
 import UserType from './types/User';
+import GetPosts from './resolvers/GetPosts';
+import MutatePost from './resolvers/MutatePost';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -30,30 +32,7 @@ const schema = new GraphQLSchema({
             type: GraphQLInt,
           },
         },
-        resolve: (root, { postId, userId }) => {
-          const filters = {};
-
-          if (postId) {
-            filters.id = postId;
-          }
-
-          if (userId) {
-            filters.userId = userId;
-          }
-
-          const user = db.get('users').find({ id: userId }).value();
-
-          if (!user) {
-            throw new Error(`Unable to identify user with id: ${userId}`);
-          }
-
-          return db.get('posts').filter(filters).value().map(post => ({
-            id: post.id,
-            user,
-            title: post.title,
-            body: post.body,
-          }));
-        },
+        resolve: (root, { args }) => GetPosts(db, { args }),
       },
       user: {
         type: UserType,
@@ -90,30 +69,7 @@ const schema = new GraphQLSchema({
             type: GraphQLString,
           },
         },
-        resolve: (root, { postId, userId, title, body }) => {
-          const filters = {};
-
-          if (postId) {
-            filters.id = postId;
-          }
-
-          if (userId) {
-            filters.userId = userId;
-          }
-
-          const post = db.get('posts').find(filters).value();
-
-          if (post) {
-            return {
-              id: post.id,
-              userId: post.userId,
-              title: title || post.title,
-              body: body || post.body,
-            };
-          }
-
-          throw new Error(`Unable to identify post: ${postId}`);
-        },
+        resolve: (root, { args }) => MutatePost(db, { args }),
       },
     },
   }),
