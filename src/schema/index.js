@@ -9,30 +9,10 @@ import lowdb from 'lowdb';
 import FileSync from 'lowdb/adapters/FileSync';
 import path from 'path';
 
-const db = lowdb(new FileSync(path.resolve(__dirname, './data.json')));
+import PostType from './types/Post';
+import UserType from './types/User';
 
-const PostType = new GraphQLObjectType({
-  name: 'post',
-  description: 'Post Item',
-  fields: () => ({
-    id: {
-      type: (GraphQLInt),
-      description: 'id of the post',
-    },
-    userId: {
-      type: (GraphQLInt),
-      description: 'id of user that created the post',
-    },
-    title: {
-      type: (GraphQLString),
-      description: 'title for post',
-    },
-    body: {
-      type: (GraphQLString),
-      description: 'body for post',
-    },
-  }),
-});
+const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -61,8 +41,29 @@ const schema = new GraphQLSchema({
             filters.userId = userId;
           }
 
-          return db.get('posts').filter(filters).value();
+          const user = db.get('users').find({ id: userId }).value();
+
+          if (!user) {
+            throw new Error(`Unable to identify user with id: ${userId}`);
+          }
+
+          return db.get('posts').filter(filters).value().map(post => ({
+            id: post.id,
+            user,
+            title: post.title,
+            body: post.body,
+          }));
         },
+      },
+      user: {
+        type: UserType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLInt,
+          },
+        },
+        resolve: (root, { id }) => db.get('users').find({ id }).value(),
       },
     },
   }),
