@@ -1,8 +1,8 @@
-const MutatePost = (db, { postId, userId, title, body }) => {
+const MutatePost = (db, { id, userId, title, body }) => {
   const filters = {};
 
-  if (postId) {
-    filters.id = postId;
+  if (id) {
+    filters.id = id;
   }
 
   if (userId) {
@@ -14,13 +14,13 @@ const MutatePost = (db, { postId, userId, title, body }) => {
   if (post) {
     return {
       id: post.id,
-      userId: post.userId,
+      user: db.get('users').find({ id: post.userId }).value(),
       title: title || post.title,
       body: body || post.body,
     };
   }
 
-  throw new Error(`Unable to identify post: ${postId}`);
+  throw new Error(`Unable to identify post with id: ${id}`);
 };
 
 export default MutatePost;
