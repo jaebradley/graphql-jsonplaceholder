@@ -4,6 +4,7 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLInt,
+  GraphQLNonNull,
 } from 'graphql/type';
 import lowdb from 'lowdb';
 import FileSync from 'lowdb/adapters/FileSync';
@@ -12,11 +13,13 @@ import path from 'path';
 import PostType from './types/Post';
 import UserType from './types/User';
 import CommentType from './types/Comment';
+import AlbumType from './types/Album';
 
 import GetPosts from './resolvers/GetPosts';
 import MutatePost from './resolvers/MutatePost';
 import GetComment from './resolvers/GetComment';
 import GetComments from './resolvers/GetComments';
+import GetAlbum from './resolvers/GetAlbum';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -67,6 +70,16 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { args }) => GetComments(db, { args }),
+      },
+      album: {
+        type: AlbumType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLNonNull(GraphQLInt),
+          },
+        },
+        resolve: (root, { id }) => GetAlbum(db, { id }),
       },
     },
   }),
