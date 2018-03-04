@@ -23,6 +23,7 @@ import GetComments from './resolvers/GetComments';
 import GetAlbum from './resolvers/GetAlbum';
 import GetAlbums from './resolvers/GetAlbums';
 import GetPhoto from './resolvers/GetPhoto';
+import GetPhotos from './resolvers/GetPhotos';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -103,6 +104,16 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { id }) => GetPhoto(db, { id }),
+      },
+      photos: {
+        type: GraphQLList(PhotoType),
+        args: {
+          albumId: {
+            name: 'albumId',
+            type: GraphQLInt,
+          },
+        },
+        resolve: (root, { albumId }) => GetPhotos(db, { albumId }),
       },
     },
   }),
