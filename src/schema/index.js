@@ -14,6 +14,7 @@ import PostType from './types/Post';
 import UserType from './types/User';
 import CommentType from './types/Comment';
 import AlbumType from './types/Album';
+import PhotoType from './types/Photo';
 
 import GetPosts from './resolvers/GetPosts';
 import MutatePost from './resolvers/MutatePost';
@@ -21,6 +22,7 @@ import GetComment from './resolvers/GetComment';
 import GetComments from './resolvers/GetComments';
 import GetAlbum from './resolvers/GetAlbum';
 import GetAlbums from './resolvers/GetAlbums';
+import GetPhoto from './resolvers/GetPhoto';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -91,6 +93,16 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { userId }) => GetAlbums(db, { userId }),
+      },
+      photo: {
+        type: PhotoType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLNonNull(GraphQLInt),
+          },
+        },
+        resolve: (root, { id }) => GetPhoto(db, { id }),
       },
     },
   }),
