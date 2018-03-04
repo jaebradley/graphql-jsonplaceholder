@@ -16,6 +16,7 @@ import CommentType from './types/Comment';
 import GetPosts from './resolvers/GetPosts';
 import MutatePost from './resolvers/MutatePost';
 import GetComment from './resolvers/GetComment';
+import GetComments from './resolvers/GetComments';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -52,6 +53,20 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { id }) => GetComment(db, { id }),
+      },
+      comments: {
+        type: GraphQLList(CommentType),
+        args: {
+          postId: {
+            name: 'postId',
+            type: GraphQLInt,
+          },
+          emailAddress: {
+            name: 'emailAddress',
+            type: GraphQLString,
+          },
+        },
+        resolve: (root, { args }) => GetComments(db, { args }),
       },
     },
   }),

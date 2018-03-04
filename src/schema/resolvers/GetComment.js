@@ -6,14 +6,12 @@ const GetComment = (db, { id }) => {
     throw new Error(`Unknown comment with id: ${id}`);
   }
 
-  const post = GetPost(db, { id: comment.postId });
-
   return {
     id: comment.id,
     name: comment.name,
     email: comment.email,
     body: comment.body,
-    post,
+    post: GetPost(db, { id: comment.postId }),
   };
 };
 
