@@ -18,6 +18,8 @@ import PhotoType from './types/Photo';
 
 import GetPosts from './resolvers/GetPosts';
 import MutatePost from './resolvers/MutatePost';
+import CreatePost from './resolvers/CreatePost';
+
 import GetComment from './resolvers/GetComment';
 import GetComments from './resolvers/GetComments';
 import GetAlbum from './resolvers/GetAlbum';
@@ -120,12 +122,12 @@ const schema = new GraphQLSchema({
   mutation: new GraphQLObjectType({
     name: 'RootMutationType',
     fields: {
-      post: {
+      updatePost: {
         type: PostType,
         args: {
-          postId: {
-            name: 'postId',
-            type: GraphQLInt,
+          id: {
+            name: 'id',
+            type: GraphQLNonNull(GraphQLInt),
           },
           userId: {
             name: 'userId',
@@ -140,7 +142,25 @@ const schema = new GraphQLSchema({
             type: GraphQLString,
           },
         },
-        resolve: (root, { args }) => MutatePost(db, { args }),
+        resolve: (root, args) => MutatePost(db, args),
+      },
+      createPost: {
+        type: PostType,
+        args: {
+          userId: {
+            name: 'userId',
+            type: GraphQLNonNull(GraphQLInt),
+          },
+          title: {
+            name: 'title',
+            type: GraphQLString,
+          },
+          body: {
+            name: 'body',
+            type: GraphQLString,
+          },
+        },
+        resolve: (root, args) => CreatePost(db, args),
       },
     },
   }),
