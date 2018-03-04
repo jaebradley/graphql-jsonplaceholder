@@ -5,9 +5,10 @@
   "main": "build/index.js",
   "scripts": {
     "start": "node ./build/server.js",
+    "clean": "rm -rf build && mkdir build",
     "codecov": "codecov",
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "compile": "babel -d build/ src/ --ignore node_modules,*.test.js --copy-files",
+    "compile": "babel -d build/ src/ --ignore node_modules,*.test.js --copy-files --delete-dir-on-start",
     "test": "jest --coverage --passWithNoTests"
   },
   "repository": {
