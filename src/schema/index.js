@@ -20,6 +20,7 @@ import MutatePost from './resolvers/MutatePost';
 import GetComment from './resolvers/GetComment';
 import GetComments from './resolvers/GetComments';
 import GetAlbum from './resolvers/GetAlbum';
+import GetAlbums from './resolvers/GetAlbums';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -80,6 +81,16 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { id }) => GetAlbum(db, { id }),
+      },
+      albums: {
+        type: GraphQLList(AlbumType),
+        args: {
+          userId: {
+            name: 'userId',
+            type: GraphQLInt,
+          },
+        },
+        resolve: (root, { userId }) => GetAlbums(db, { userId }),
       },
     },
   }),
