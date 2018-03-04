@@ -22,6 +22,8 @@ import CreatePost from './resolvers/CreatePost';
 
 import GetComment from './resolvers/GetComment';
 import GetComments from './resolvers/GetComments';
+import UpdateComment from './resolvers/UpdateComment';
+
 import GetAlbum from './resolvers/GetAlbum';
 import GetAlbums from './resolvers/GetAlbums';
 import GetPhoto from './resolvers/GetPhoto';
@@ -161,6 +163,32 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, args) => CreatePost(db, args),
+      },
+      updateComment: {
+        type: CommentType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLNonNull(GraphQLInt),
+          },
+          postId: {
+            name: 'postId',
+            type: GraphQLInt,
+          },
+          name: {
+            name: 'name',
+            type: GraphQLString,
+          },
+          email: {
+            name: 'email',
+            type: GraphQLString,
+          },
+          body: {
+            name: 'body',
+            type: GraphQLString,
+          },
+        },
+        resolve: (root, args) => UpdateComment(db, args),
       },
     },
   }),
