@@ -11,8 +11,11 @@ import path from 'path';
 
 import PostType from './types/Post';
 import UserType from './types/User';
+import CommentType from './types/Comment';
+
 import GetPosts from './resolvers/GetPosts';
 import MutatePost from './resolvers/MutatePost';
+import GetComment from './resolvers/GetComment';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -23,10 +26,6 @@ const schema = new GraphQLSchema({
       posts: {
         type: GraphQLList(PostType),
         args: {
-          postId: {
-            name: 'postId',
-            type: GraphQLInt,
-          },
           userId: {
             name: 'userId',
             type: GraphQLInt,
@@ -43,6 +42,16 @@ const schema = new GraphQLSchema({
           },
         },
         resolve: (root, { id }) => db.get('users').find({ id }).value(),
+      },
+      comment: {
+        type: CommentType,
+        args: {
+          id: {
+            name: 'id',
+            type: GraphQLInt,
+          },
+        },
+        resolve: (root, { id }) => GetComment(db, { id }),
       },
     },
   }),

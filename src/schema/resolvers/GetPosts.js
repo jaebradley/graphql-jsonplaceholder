@@ -1,19 +1,5 @@
-const GetPosts = (db, { postId, userId }) => {
-  const filters = {};
-
-  if (postId) {
-    filters.id = postId;
-  }
-
-  if (userId) {
-    filters.userId = userId;
-  }
-
-  const user = db.get('users').find({ id: userId }).value();
-
-  if (!user) {
-    throw new Error(`Unable to identify user with id: ${userId}`);
-  }
+const GetPosts = (db, { userId }) => {
+  const filters = userId ? { userId } : {};
 
   return db
     .get('posts')
@@ -23,7 +9,7 @@ const GetPosts = (db, { postId, userId }) => {
       id: post.id,
       title: post.title,
       body: post.body,
-      user,
+      user: db.get('users').find({ id: post.userId }).value(),
     }));
 };
 
