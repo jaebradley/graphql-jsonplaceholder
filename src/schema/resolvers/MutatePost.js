@@ -1,4 +1,6 @@
-const MutatePost = (db, { id, userId, title, body }) => {
+const MutatePost = (db, {
+  id, userId, title, body,
+}) => {
   const filters = {};
 
   if (id) {
