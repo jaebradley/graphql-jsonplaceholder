@@ -1,11 +1,12 @@
 {
   "name": "graphql-jsonplaceholder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GraphQL implementation of jsonplaceholder API",
-  "main": "build/index.js",
+  "main": "build/server.js",
   "scripts": {
     "lint": "eslint *.js .",
-    "start": "node ./build/server.js",
+    "start": "npm run compile && node ./build/server.js",
+    "heroku-postbuild": "npm run compile",
     "clean": "rm -rf build && mkdir build",
     "codecov": "codecov",
     "commitmsg": "commitlint -e $GIT_PARAMS",
