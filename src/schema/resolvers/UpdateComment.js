@@ -1,4 +1,6 @@
-const UpdateComment = (db, { id, postId, name, email, body }) => {
+const UpdateComment = (db, {
+  id, postId, name, email, body,
+}) => {
   const comment = db.get('comments').find({ id }).value();
 
   if (!comment) {
