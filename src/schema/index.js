@@ -22,10 +22,13 @@ import GetTodo from './resolvers/GetTodo';
 import GetTodos from './resolvers/GetTodos';
 import GetPhotoAlbum from './resolvers/GetPhotoAlbum';
 import GetPhotoAlbums from './resolvers/GetPhotoAlbums';
+import GetPhoto from './resolvers/GetPhoto';
+import GetPhotos from './resolvers/GetPhotos';
 
 import User from '../data/User';
 import Todo from '../data/Todo';
 import PhotoAlbum from '../data/PhotoAlbum';
+import Photo from '../data/Photo';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -45,6 +48,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
       return GetPhotoAlbum(db, { id });
     }
 
+    if (type === 'Photo') {
+      return GetPhoto(db, { id });
+    }
+
     return null;
   },
   (obj) => {
@@ -58,6 +65,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
 
     if (obj instanceof PhotoAlbum) {
       return PhotoAlbumType; // eslint-disable-line no-use-before-define
+    }
+
+    if (obj instanceof Photo) {
+      return PhotoType; // eslint-disable-line no-use-before-define
     }
 
     return null;
@@ -81,6 +92,34 @@ const TodoType = new GraphQLObjectType({
   },
 });
 
+const PhotoType = new GraphQLObjectType({
+  name: 'Photo',
+  definition: 'A picture graph',
+  interfaces: [nodeInterface],
+  fields: {
+    id: globalIdField('Photo'),
+    title: {
+      type: GraphQLString,
+      description: 'Title of photo',
+    },
+    url: {
+      type: GraphQLString,
+      description: 'URL for photo',
+    },
+    thumbnailUrl: {
+      type: GraphQLString,
+      description: 'URL for thumbnail',
+    },
+  },
+});
+
+const {
+  connectionType: PhotosConnection,
+} = connectionDefinitions({
+  name: 'Photo',
+  nodeType: PhotoType,
+});
+
 const PhotoAlbumType = new GraphQLObjectType({
   name: 'PhotoAlbum',
   definition: 'A photo album',
@@ -90,6 +129,12 @@ const PhotoAlbumType = new GraphQLObjectType({
     title: {
       type: GraphQLString,
       description: 'Title of photo album',
+    },
+    photos: {
+      type: PhotosConnection,
+      description: 'Photos that comprise album',
+      args: connectionArgs,
+      resolve: (album, args) => connectionFromArray(GetPhotos(db, { albumId: album.id }), args),
     },
   },
 });
