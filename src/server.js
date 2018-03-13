@@ -6,7 +6,6 @@ import schema from './schema';
 
 const app = express();
 
-// fuck it
 app.use(cors());
 
 app.use('/graphql', graphqlHTTP({
