@@ -1,19 +1,9 @@
-import GetAlbum from './GetAlbum';
+import Photo from '../../data/Photo';
 
-const GetPhotos = (db, { albumId }) => {
-  const filters = albumId ? { albumId } : {};
-
-  return db
-    .get('photos')
-    .filter(filters)
-    .value()
-    .map(photo => ({
-      id: photo.id,
-      title: photo.title,
-      url: photo.url,
-      thumbnailUrl: photo.thumbnailUrl,
-      album: GetAlbum(db, { id: photo.albumId }),
-    }));
-};
+const GetPhotos = (db, { albumId }) => db
+  .get('photos')
+  .filter({ albumId })
+  .value()
+  .map(photo => new Photo(photo));
 
 export default GetPhotos;
