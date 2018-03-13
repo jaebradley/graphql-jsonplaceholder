@@ -20,8 +20,12 @@ import path from 'path';
 import GetUser from './resolvers/GetUser';
 import GetTodo from './resolvers/GetTodo';
 import GetTodos from './resolvers/GetTodos';
+import GetPhotoAlbum from './resolvers/GetPhotoAlbum';
+import GetPhotoAlbums from './resolvers/GetPhotoAlbums';
+
 import User from '../data/User';
 import Todo from '../data/Todo';
+import PhotoAlbum from '../data/PhotoAlbum';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -37,6 +41,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
       return GetTodo(db, { id });
     }
 
+    if (type === 'PhotoAlbum') {
+      return GetPhotoAlbum(db, { id });
+    }
+
     return null;
   },
   (obj) => {
@@ -46,6 +54,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
 
     if (obj instanceof Todo) {
       return TodoType; // eslint-disable-line no-use-before-define
+    }
+
+    if (obj instanceof PhotoAlbum) {
+      return PhotoAlbumType; // eslint-disable-line no-use-before-define
     }
 
     return null;
@@ -69,11 +81,31 @@ const TodoType = new GraphQLObjectType({
   },
 });
 
+const PhotoAlbumType = new GraphQLObjectType({
+  name: 'PhotoAlbum',
+  definition: 'A photo album',
+  interfaces: [nodeInterface],
+  fields: {
+    id: globalIdField('PhotoAlbum'),
+    title: {
+      type: GraphQLString,
+      description: 'Title of photo album',
+    },
+  },
+});
+
 const {
   connectionType: TodosConnection,
 } = connectionDefinitions({
   name: 'Todo',
   nodeType: TodoType,
+});
+
+const {
+  connectionType: AlbumsConnection,
+} = connectionDefinitions({
+  name: 'PhotoAlbum',
+  nodeType: PhotoAlbumType,
 });
 
 const UserType = new GraphQLObjectType({
@@ -99,6 +131,12 @@ const UserType = new GraphQLObjectType({
       description: 'Todos for User',
       args: connectionArgs,
       resolve: (user, args) => connectionFromArray(GetTodos(db, { userId: user.id }), args),
+    },
+    albums: {
+      type: AlbumsConnection,
+      description: 'Photo Albums for user',
+      args: connectionArgs,
+      resolve: (user, args) => connectionFromArray(GetPhotoAlbums(db, { userId: user.id }), args),
     },
   },
 });
