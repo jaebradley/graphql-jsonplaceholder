@@ -26,12 +26,15 @@ import GetPhoto from './resolvers/GetPhoto';
 import GetPhotos from './resolvers/GetPhotos';
 import GetPost from './resolvers/GetPost';
 import GetPosts from './resolvers/GetPosts';
+import GetComment from './resolvers/GetComment';
+import GetComments from './resolvers/GetComments';
 
 import User from '../data/User';
 import Todo from '../data/Todo';
 import PhotoAlbum from '../data/PhotoAlbum';
 import Photo from '../data/Photo';
 import Post from '../data/Post';
+import Comment from '../data/Comment';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -59,6 +62,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
       return GetPost(db, { id });
     }
 
+    if (type === 'Comment') {
+      return GetComment(db, { id });
+    }
+
     return null;
   },
   (obj) => {
@@ -80,6 +87,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
 
     if (obj instanceof Post) {
       return PostType; // eslint-disable-line no-use-before-define
+    }
+
+    if (obj instanceof Comment) {
+      return CommentType; // eslint-disable-line no-use-before-define
     }
 
     return null;
@@ -124,11 +135,39 @@ const PhotoType = new GraphQLObjectType({
   },
 });
 
+const CommentType = new GraphQLObjectType({
+  name: 'Comment',
+  definition: 'A Post Comment',
+  interfaces: [nodeInterface],
+  fields: {
+    id: globalIdField('Comment'),
+    name: {
+      type: GraphQLString,
+      description: 'Name of comment',
+    },
+    email: {
+      type: GraphQLString,
+      description: 'Email address of commenter',
+    },
+    body: {
+      type: GraphQLString,
+      description: 'Comment body',
+    },
+  },
+});
+
 const {
   connectionType: PhotosConnection,
 } = connectionDefinitions({
   name: 'Photo',
   nodeType: PhotoType,
+});
+
+const {
+  connectionType: CommentsConnection,
+} = connectionDefinitions({
+  name: 'Comment',
+  nodeType: CommentType,
 });
 
 const PhotoAlbumType = new GraphQLObjectType({
@@ -163,6 +202,12 @@ const PostType = new GraphQLObjectType({
     body: {
       type: GraphQLString,
       description: 'Body of post',
+    },
+    comments: {
+      type: CommentsConnection,
+      description: 'Comments associated with post',
+      args: connectionArgs,
+      resolve: (post, args) => connectionFromArray(GetComments(db, { postId: post.id }), args),
     },
   },
 });
