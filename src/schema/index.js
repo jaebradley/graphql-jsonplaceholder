@@ -24,11 +24,14 @@ import GetPhotoAlbum from './resolvers/GetPhotoAlbum';
 import GetPhotoAlbums from './resolvers/GetPhotoAlbums';
 import GetPhoto from './resolvers/GetPhoto';
 import GetPhotos from './resolvers/GetPhotos';
+import GetPost from './resolvers/GetPost';
+import GetPosts from './resolvers/GetPosts';
 
 import User from '../data/User';
 import Todo from '../data/Todo';
 import PhotoAlbum from '../data/PhotoAlbum';
 import Photo from '../data/Photo';
+import Post from '../data/Post';
 
 const db = lowdb(new FileSync(path.resolve(__dirname, '../data.json')));
 
@@ -52,6 +55,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
       return GetPhoto(db, { id });
     }
 
+    if (type === 'Posts') {
+      return GetPost(db, { id });
+    }
+
     return null;
   },
   (obj) => {
@@ -69,6 +76,10 @@ const { nodeInterface, nodeField } = nodeDefinitions(
 
     if (obj instanceof Photo) {
       return PhotoType; // eslint-disable-line no-use-before-define
+    }
+
+    if (obj instanceof Post) {
+      return PostType; // eslint-disable-line no-use-before-define
     }
 
     return null;
@@ -139,6 +150,23 @@ const PhotoAlbumType = new GraphQLObjectType({
   },
 });
 
+const PostType = new GraphQLObjectType({
+  name: 'Post',
+  definition: 'A post',
+  interfaces: [nodeInterface],
+  fields: {
+    id: globalIdField('Post'),
+    title: {
+      type: GraphQLString,
+      description: 'Title of post',
+    },
+    body: {
+      type: GraphQLString,
+      description: 'Body of post',
+    },
+  },
+});
+
 const {
   connectionType: TodosConnection,
 } = connectionDefinitions({
@@ -151,6 +179,13 @@ const {
 } = connectionDefinitions({
   name: 'PhotoAlbum',
   nodeType: PhotoAlbumType,
+});
+
+const {
+  connectionType: PostsConnection,
+} = connectionDefinitions({
+  name: 'Post',
+  nodeType: PostType,
 });
 
 const UserType = new GraphQLObjectType({
@@ -182,6 +217,12 @@ const UserType = new GraphQLObjectType({
       description: 'Photo Albums for user',
       args: connectionArgs,
       resolve: (user, args) => connectionFromArray(GetPhotoAlbums(db, { userId: user.id }), args),
+    },
+    posts: {
+      type: PostsConnection,
+      description: 'Posts for user',
+      args: connectionArgs,
+      resolve: (user, args) => connectionFromArray(GetPosts(db, { userId: user.id }), args),
     },
   },
 });
