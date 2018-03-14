@@ -1,16 +1,9 @@
-const GetPosts = (db, { userId }) => {
-  const filters = userId ? { userId } : {};
+import Post from '../../data/Post';
 
-  return db
-    .get('posts')
-    .filter(filters)
-    .value()
-    .map(post => ({
-      id: post.id,
-      title: post.title,
-      body: post.body,
-      user: db.get('users').find({ id: post.userId }).value(),
-    }));
-};
+const GetPosts = (db, { userId }) => db
+  .get('posts')
+  .filter({ userId })
+  .value()
+  .map(post => new Post(post));
 
 export default GetPosts;

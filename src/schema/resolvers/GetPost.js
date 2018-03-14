@@ -1,3 +1,5 @@
+import Post from '../../data/Post';
+
 const GetPost = (db, { id }) => {
   const post = db.get('posts').find({ id }).value();
 
@@ -5,11 +7,7 @@ const GetPost = (db, { id }) => {
     throw new Error(`Unknown post with id: ${id}`);
   }
 
-  return {
-    id: post.id,
-    title: post.title,
-    body: post.body,
-  };
+  return new Post(post);
 };
 
 export default GetPost;
