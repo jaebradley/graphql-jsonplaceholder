@@ -1,4 +1,4 @@
-import GetPost from './GetPost';
+import Comment from '../../data/Comment';
 
 const GetComment = (db, { id }) => {
   const comment = db.get('comments').find({ id }).value();
@@ -6,13 +6,7 @@ const GetComment = (db, { id }) => {
     throw new Error(`Unknown comment with id: ${id}`);
   }
 
-  return {
-    id: comment.id,
-    name: comment.name,
-    email: comment.email,
-    body: comment.body,
-    post: GetPost(db, { id: comment.postId }),
-  };
+  return new Comment(comment);
 };
 
 export default GetComment;
