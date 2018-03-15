@@ -57,7 +57,7 @@ const { nodeInterface, nodeField } = nodeDefinitions(
   },
   (obj) => {
     if (obj instanceof User) {
-      return UserType; // eslint-disable-line no-use-before-define
+      return UserType;
     }
 
     if (obj instanceof Todo) {
@@ -65,19 +65,19 @@ const { nodeInterface, nodeField } = nodeDefinitions(
     }
 
     if (obj instanceof PhotoAlbum) {
-      return PhotoAlbumType; // eslint-disable-line no-use-before-define
+      return PhotoAlbumType;
     }
 
     if (obj instanceof Photo) {
-      return PhotoType; // eslint-disable-line no-use-before-define
+      return PhotoType;
     }
 
     if (obj instanceof Post) {
-      return PostType; // eslint-disable-line no-use-before-define
+      return PostType;
     }
 
     if (obj instanceof Comment) {
-      return CommentType; // eslint-disable-line no-use-before-define
+      return CommentType;
     }
 
     return null;
