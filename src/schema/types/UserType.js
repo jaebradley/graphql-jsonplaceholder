@@ -44,7 +44,7 @@ const UserType = new GraphQLObjectType({
       args: connectionArgs,
       resolve: (user, args) => connectionFromArray(GetTodos(db, { userId: user.id }), args),
     },
-    albums: {
+    photoAlbums: {
       type: PhotoAlbumsConnection,
       description: 'Photo Albums for user',
       args: connectionArgs,
