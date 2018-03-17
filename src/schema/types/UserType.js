@@ -12,7 +12,7 @@ import GetTodos from '../resolvers/GetTodos';
 import GetPhotoAlbums from '../resolvers/GetPhotoAlbums';
 import GetPosts from '../resolvers/GetPosts';
 
-import AlbumsConnection from '../connections/AlbumsConnection';
+import PhotoAlbumsConnection from '../connections/PhotoAlbumsConnection';
 import PostsConnection from '../connections/PostsConnection';
 import TodosConnection from '../connections/TodosConnection';
 
@@ -45,7 +45,7 @@ const UserType = new GraphQLObjectType({
       resolve: (user, args) => connectionFromArray(GetTodos(db, { userId: user.id }), args),
     },
     albums: {
-      type: AlbumsConnection,
+      type: PhotoAlbumsConnection,
       description: 'Photo Albums for user',
       args: connectionArgs,
       resolve: (user, args) => connectionFromArray(GetPhotoAlbums(db, { userId: user.id }), args),
