@@ -12,6 +12,9 @@ import GetTodos from '../resolvers/GetTodos';
 import GetPhotoAlbums from '../resolvers/GetPhotoAlbums';
 import GetPosts from '../resolvers/GetPosts';
 
+import AddressType from './AddressType';
+import CompanyType from './CompanyType';
+
 import PhotoAlbumsConnection from '../connections/PhotoAlbumsConnection';
 import PostsConnection from '../connections/PostsConnection';
 import TodosConnection from '../connections/TodosConnection';
@@ -37,6 +40,22 @@ const UserType = new GraphQLObjectType({
     email: {
       type: GraphQLString,
       description: 'User email address',
+    },
+    phone: {
+      type: GraphQLString,
+      description: 'User phone number',
+    },
+    website: {
+      type: GraphQLString,
+      description: 'User website',
+    },
+    address: {
+      type: AddressType,
+      description: 'User address',
+    },
+    company: {
+      type: CompanyType,
+      description: 'User company',
     },
     todos: {
       type: TodosConnection,
