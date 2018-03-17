@@ -3,10 +3,10 @@ import { connectionDefinitions } from 'graphql-relay';
 import PhotoAlbumType from '../types/PhotoAlbumType';
 
 const {
-  connectionType: AlbumsConnection,
+  connectionType: PhotoAlbumsConnection,
 } = connectionDefinitions({
   name: 'PhotoAlbum',
   nodeType: PhotoAlbumType,
 });
 
-export default AlbumsConnection;
+export default PhotoAlbumsConnection;
